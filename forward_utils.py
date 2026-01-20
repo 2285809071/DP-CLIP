@@ -496,8 +496,6 @@ from sklearn.metrics import auc
 from statistics import mean
 from sklearn.metrics import roc_auc_score, precision_recall_curve, average_precision_score
 
-# ... (Previous helper functions like return_best_thr, compute_pro, losses, text embeddings, etc. remain unchanged) ...
-
 def normalize(pred, max_value=None, min_value=None):
     if max_value is None or min_value is None:
         return (pred - pred.min()) / (pred.max() - pred.min())
@@ -610,74 +608,3 @@ def visualization(results, obj_list, img_size, save_path):
             # 3. Heatmap Visualization
             cv2.imwrite(os.path.join(save_vis, f"{fname_no_ext}_vis.jpg"), vis_heatmap)
             
-            
-def plot_tsne(features, labels, class_names, save_path, title="T-SNE Visualization"):
-    """
-    features: (N, D) numpy array
-    labels: (N,) numpy array (0 for Normal, 1 for Anomaly)
-    class_names: list of strings corresponding to the source dataset/class for each point
-    save_path: str, path to save the image
-    """
-    print(f"Generating T-SNE plot to {save_path}...")
-    
-    # -----------------------------------------------------------
-    # FIX: 动态计算 perplexity 以防止 ValueError
-    n_samples = features.shape[0]
-    # perplexity 必须小于 n_samples。通常 perplexity 在 5 到 50 之间。
-    # 这里我们设置一个逻辑：如果样本少，就用样本数减 1，否则用默认的 30
-    target_perplexity = 30
-    if n_samples <= target_perplexity:
-        perplexity_val = max(1, n_samples - 1)  # 保证至少为 1
-        print(f"Warning: n_samples ({n_samples}) <= 30. Adjusting perplexity to {perplexity_val}.")
-    else:
-        perplexity_val = target_perplexity
-    # -----------------------------------------------------------
-
-    # Perform T-SNE
-    # MODIFIED: 使用动态计算的 perplexity_val，且移除了 n_iter
-    tsne = TSNE(n_components=2, verbose=0, perplexity=perplexity_val, random_state=42)
-    tsne_results = tsne.fit_transform(features)
-
-    # Prepare DataFrame for Seaborn
-    df_subset = pd.DataFrame()
-    df_subset['tsne-2d-one'] = tsne_results[:,0]
-    df_subset['tsne-2d-two'] = tsne_results[:,1]
-    
-    # Convert binary labels to strings
-    label_str = []
-    for l in labels:
-        label_str.append('Normal' if l == 0 else 'Anomaly')
-    df_subset['Condition'] = label_str
-    df_subset['Class'] = class_names
-
-    plt.figure(figsize=(10, 8))
-    
-    # Plot Logic
-    if len(set(class_names)) > 1:
-        # Multiple classes (Medical scenario)
-        sns.scatterplot(
-            x="tsne-2d-one", y="tsne-2d-two",
-            hue="Class",
-            style="Condition",
-            palette=sns.color_palette("hls", len(set(class_names))),
-            data=df_subset,
-            legend="full",
-            alpha=0.8,
-            s=100
-        )
-    else:
-        # Single class (MVTec scenario)
-        sns.scatterplot(
-            x="tsne-2d-one", y="tsne-2d-two",
-            hue="Condition",
-            palette={"Normal": "tab:blue", "Anomaly": "tab:red"},
-            data=df_subset,
-            legend="full",
-            alpha=0.8,
-            s=100
-        )
-
-    plt.title(title)
-    plt.tight_layout()
-    plt.savefig(save_path)
-    plt.close()
