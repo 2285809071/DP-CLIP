@@ -6,7 +6,7 @@ Vision-Language Models have demonstrated immense potential in the field of Zero-
 ## Overview of AdaCLIP
 ![image](pic/Overall.png)
 ## Visualization
-![image](pic/Visalization.png)
+![image](pic/Visualization.png)
 ## Quick Start 
 ### 1. Installation  
 ```bash
