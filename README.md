@@ -20,6 +20,8 @@ The datasets can be downloaded from [MVTec-AD](https://www.mvtec.com/company/res
 > 🔧 **Coming soon!**
 The pre-trained weights of our model will be released soon.
 ```bash
+# train
+python train.py --save_path ./ckpt/DP_CLIP 
 # test
 python test.py --save_path $save_path --dataset $dataset
 # train&test
