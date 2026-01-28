@@ -26,4 +26,3 @@ bash test.sh
 Model definition is in ``./model/``. We thank [```open_clip```](https://github.com/mlfoundations/open_clip.git) for being open-source. To run the code, one has to download the weight of OpenCLIP ViT-L-14-336px and put it under ```./model/```.
 
 ## Main Results
-![image](pic/Experiments.png)
